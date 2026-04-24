@@ -44,9 +44,11 @@ def ensure_uv():
 
 
 def create_venv():
-    """Create a .venv virtual environment using uv."""
-    print("\n📁 Creating virtual environment with uv...")
-    run(["uv", "venv", ".venv"])
+    """Install Python 3.12 via uv if needed, then create the .venv."""
+    print("\n🐍 Ensuring Python 3.12 is available...")
+    run(["uv", "python", "install", "3.12"])
+    print("\n📁 Creating virtual environment with uv (Python 3.12)...")
+    run(["uv", "venv", ".venv", "--python", "3.12"])
 
 
 def install_torch():

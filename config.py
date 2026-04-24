@@ -46,6 +46,50 @@ RESULTS_DIR         = os.path.join(DATA_DIR, "results")
 for _dir in [DATA_DIR, HIDDEN_STATES_DIR, RESULTS_DIR]:
     os.makedirs(_dir, exist_ok=True)
 
+# ── Probe hyperparameters (tune these to experiment) ─────────────────────────
+#
+# Each time you change these and re-run 04_probe.py, a new timestamped report
+# is saved to data/results/runs/ so you can compare runs side by side.
+#
+PROBE_CONFIG = {
+    # ── Probe classifier ──────────────────────────────────────────────────────
+    "C"           : 1.0,       # Regularization strength. Lower = stronger regularization
+                               # (simpler probe, less overfitting). Try: 0.01, 0.1, 1.0, 10.0
+
+    "max_iter"    : 1000,      # Max iterations for logistic regression solver.
+                               # Increase if you see convergence warnings.
+
+    "solver"      : "lbfgs",   # Optimization algorithm. "lbfgs" is best for small-medium
+                               # data. Alternatives: "saga" (faster on large data),
+                               # "newton-cg", "sag"
+
+    "probe_type"  : "linear",  # "linear" = logistic regression (standard, interpretable)
+                               # "mlp"    = small neural probe (more expressive, less
+                               #            interpretable — use to check if linear is enough)
+
+    # ── MLP probe settings (only used when probe_type = "mlp") ───────────────
+    "mlp_hidden"  : 128,       # Hidden layer size for MLP probe. Try: 64, 128, 256
+    "mlp_layers"  : 1,         # Number of hidden layers. Try: 1, 2
+
+    # ── Data split ────────────────────────────────────────────────────────────
+    "test_size"   : 0.2,       # Fraction of data held out for testing.
+                               # Try: 0.1 (more training data), 0.3 (stricter test)
+
+    "random_seed" : 42,        # Controls train/test split and classifier init.
+                               # Change to check result stability across splits.
+
+    # ── Pooling strategy ──────────────────────────────────────────────────────
+    "pooling"     : "mean",    # How to collapse the time dimension of hidden states.
+                               # "mean" = average all frames (default)
+                               # "max"  = max over frames (captures peaks)
+                               # "first" = first frame only (like [CLS] token)
+
+    # ── Run metadata (shown in report, helps you remember what you tested) ────
+    "run_label"   : "baseline",  # Short name for this run. Change for each experiment,
+                                 # e.g. "C=0.1", "mlp_probe", "max_pooling", "seed=7"
+    "notes"       : "",          # Optional free-text notes about this run.
+}
+
 # ── Vietnamese tone map ───────────────────────────────────────────────────────
 # Maps Unicode combining diacritics / precomposed vowel marks → tone label.
 # Northern Vietnamese 6-tone system.
