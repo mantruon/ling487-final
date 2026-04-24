@@ -29,18 +29,16 @@ git clone git@github.com:mantruon/ling487-final.git
 cd ling487-final
 ```
 
-### 2. Create a virtual environment (recommended)
+### 2. Install uv (if you don't have it already)
 
-**Mac:**
+**Mac/Linux:**
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 **Windows:**
 ```powershell
-python -m venv .venv
-.venv\Scripts\activate
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 ### 3. Run setup (auto-detects Mac MPS vs. Windows CUDA vs. CPU)
@@ -49,10 +47,23 @@ python setup.py
 ```
 
 This will:
+- Create a `.venv` virtual environment using `uv`
 - Install PyTorch with MPS support on Apple Silicon Macs
 - Install PyTorch with CUDA on Windows machines with an NVIDIA GPU
 - Fall back to CPU-only PyTorch otherwise
-- Install all remaining dependencies from requirements.txt
+- Install all remaining dependencies from `requirements.txt` via `uv pip`
+
+### 4. Activate the environment
+
+**Mac/Linux:**
+```bash
+source .venv/bin/activate
+```
+
+**Windows:**
+```powershell
+.venv\Scripts\activate
+```
 
 ## Run Order
 
