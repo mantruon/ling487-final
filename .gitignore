@@ -1,0 +1,41 @@
+# ── Generated data (do NOT push to GitHub) ───────────────────────────────────
+data/
+# This folder contains hidden states (.npy files, potentially GBs),
+# labeled JSON, and result plots. Regenerate locally by running 01→06.
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ── Hugging Face cache ────────────────────────────────────────────────────────
+# HF downloads models and datasets here — large, no need to push
+.cache/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── OS files ──────────────────────────────────────────────────────────────────
+.DS_Store           # Mac
+Thumbs.db           # Windows
+desktop.ini         # Windows
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo

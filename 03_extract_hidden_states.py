@@ -19,7 +19,7 @@ from transformers import WhisperModel, WhisperProcessor
 from tqdm import tqdm
 from config import (
     DATASET_NAME, DATASET_LANG, DATASET_SPLIT, MAX_SAMPLES,
-    WHISPER_MODEL, SAMPLE_RATE, LABELED_PATH, HIDDEN_STATES_DIR
+    WHISPER_MODEL, SAMPLE_RATE, LABELED_PATH, HIDDEN_STATES_DIR, DEVICE
 )
 
 
@@ -57,10 +57,9 @@ def main():
         ds = ds.select(range(min(MAX_SAMPLES, len(ds))))
 
     # ── Load Whisper ──────────────────────────────────────────────────────────
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"Loading {WHISPER_MODEL} on {device}…")
+    print(f"Loading {WHISPER_MODEL} on {DEVICE}…")
     processor = WhisperProcessor.from_pretrained(WHISPER_MODEL)
-    model     = WhisperModel.from_pretrained(WHISPER_MODEL).to(device)
+    model     = WhisperModel.from_pretrained(WHISPER_MODEL).to(DEVICE)
     model.eval()
 
     num_layers = model.config.encoder_layers
@@ -92,7 +91,7 @@ def main():
             audio_array,
             sampling_rate=SAMPLE_RATE,
             return_tensors="pt"
-        ).input_features.to(device)
+        ).input_features.to(DEVICE)
 
         # Forward pass through encoder
         with torch.no_grad():

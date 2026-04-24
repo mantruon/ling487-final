@@ -1,8 +1,31 @@
 # config.py
 # Shared constants and paths for the entire project.
 # Edit these values to change model size, dataset split, etc.
+# Automatically detects platform: Mac (MPS), Windows/Linux (CUDA or CPU).
 
 import os
+import sys
+import platform
+import torch
+
+# ── Platform detection ────────────────────────────────────────────────────────
+SYSTEM = platform.system()   # "Darwin" = Mac, "Windows" = Windows, "Linux" = Linux
+
+def get_device() -> str:
+    """
+    Picks the best available compute device:
+      - Mac Apple Silicon → 'mps'   (Metal Performance Shaders, M1/M2/M3/M4)
+      - Windows/Linux GPU → 'cuda'
+      - Fallback          → 'cpu'
+    """
+    if SYSTEM == "Darwin" and torch.backends.mps.is_available():
+        return "mps"
+    if torch.cuda.is_available():
+        return "cuda"
+    return "cpu"
+
+DEVICE = get_device()
+print(f"[config] Platform: {SYSTEM} | Device: {DEVICE} | Python: {sys.version.split()[0]}")
 
 # ── Model ─────────────────────────────────────────────────────────────────────
 WHISPER_MODEL  = "openai/whisper-small"   # options: tiny, base, small, medium, large-v3
