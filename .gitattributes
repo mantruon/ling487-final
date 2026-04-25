@@ -1,0 +1,27 @@
+# .gitattributes
+# Normalizes line endings across Mac and Windows.
+# All text files are stored as LF in the repository.
+# Windows will convert to CRLF on checkout, Mac stays LF.
+
+# Default: normalize all text files to LF on commit
+* text=auto eol=lf
+
+# Python files — always LF
+*.py    text eol=lf
+
+# Config and data files — always LF
+*.json  text eol=lf
+*.txt   text eol=lf
+*.md    text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.toml  text eol=lf
+*.cfg   text eol=lf
+
+# Binary files — no line ending conversion
+*.png   binary
+*.jpg   binary
+*.npy   binary
+*.pt    binary
+*.bin   binary
+*.wav   binary
