@@ -21,15 +21,39 @@ from config import (
 
 def extract_tone(text: str) -> str:
     """
-    Return the tone name of the first toned syllable found in `text`.
-    Falls back to 'ngang' (level, no mark) if none found.
+    Return the most frequent tone in `text` across all syllables.
+    Uses majority voting so ngang (no diacritic) can win if it appears
+    most often. Falls back to 'ngang' if text is empty.
     """
-    # Normalize to NFD so combining diacritics are separate code points
     nfd = unicodedata.normalize("NFD", text)
+
+    # Count toned diacritics found
+    tone_counts = {name: 0 for name in TONE_DIACRITICS.values()}
+
     for char in nfd:
         if char in TONE_DIACRITICS:
-            return TONE_DIACRITICS[char]
-    return "ngang"   # default: level tone (no diacritic)
+            tone_counts[TONE_DIACRITICS[char]] += 1
+
+    # Count ngang syllables: Vietnamese syllables without any tone diacritic.
+    # Approximate by counting standalone vowel characters in NFD that have
+    # no following tone diacritic. Simpler proxy: count word tokens that
+    # contain no tone diacritic at all.
+    tone_diacritic_set = set(TONE_DIACRITICS.keys())
+    ngang_count = 0
+    for word in text.split():
+        word_nfd = unicodedata.normalize("NFD", word)
+        has_tone = any(c in tone_diacritic_set for c in word_nfd)
+        # Check if word has a Vietnamese vowel (indicating it's a syllable)
+        has_vowel = any(c in "aăâeêioôơuưy" for c in word.lower())
+        if has_vowel and not has_tone:
+            ngang_count += 1
+
+    tone_counts["ngang"] = ngang_count
+
+    # Return the majority tone
+    if sum(tone_counts.values()) == 0:
+        return "ngang"
+    return max(tone_counts, key=lambda t: tone_counts[t])
 
 
 def label_dataset(ds) -> list[dict]:
