@@ -28,7 +28,7 @@ TONE_COLORS = {
 
 def load_hidden_states(hidden_states_dir: str):
     meta_path = os.path.join(hidden_states_dir, "meta.json")
-    with open(meta_path) as f:
+    with open(meta_path, encoding="utf-8") as f:
         meta = json.load(f)
 
     X_list, y_list = [], []
@@ -147,14 +147,14 @@ def main():
     if not os.path.exists(probe_path):
         raise FileNotFoundError("probe_results.json not found. Run 04_probe.py first.")
 
-    with open(probe_path) as f:
+    with open(probe_path, encoding="utf-8") as f:
         probe_results = json.load(f)
 
     # Optional: acoustic baseline for comparison line
     baseline_path = os.path.join(RESULTS_DIR, "baseline_results.json")
     baseline_acc  = None
     if os.path.exists(baseline_path):
-        with open(baseline_path) as f:
+        with open(baseline_path, encoding="utf-8") as f:
             baseline_acc = json.load(f)["acoustic_baseline_accuracy"]
 
     best_layer_info = max(probe_results["layer_results"], key=lambda r: r["accuracy"])

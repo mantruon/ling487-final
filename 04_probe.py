@@ -33,7 +33,7 @@ def load_data(hidden_states_dir: str) -> tuple[np.ndarray, np.ndarray]:
     meta_path = os.path.join(hidden_states_dir, "meta.json")
     if not os.path.exists(meta_path):
         raise FileNotFoundError("meta.json not found. Run 03_extract_hidden_states.py first.")
-    with open(meta_path) as f:
+    with open(meta_path, encoding="utf-8") as f:
         meta = json.load(f)
     X_list, y_list = [], []
     for idx_str, tone_id in sorted(meta.items(), key=lambda x: int(x[0])):
@@ -51,7 +51,7 @@ def make_probe(cfg: dict):
     if cfg["probe_type"] == "linear":
         return LogisticRegression(
             C=cfg["C"], max_iter=cfg["max_iter"], solver=cfg["solver"],
-            multi_class="multinomial", random_state=cfg["random_seed"],
+            random_state=cfg["random_seed"],
         )
     elif cfg["probe_type"] == "mlp":
         hidden = tuple([cfg["mlp_hidden"]] * cfg["mlp_layers"])
@@ -76,10 +76,15 @@ def probe_layer(X_layer: np.ndarray, y: np.ndarray, cfg: dict) -> dict:
     preds = clf.predict(X_test)
     acc = accuracy_score(y_test, preds)
     cm  = confusion_matrix(y_test, preds)
-    tone_keys = [TONE_NAMES[i] for i in range(len(TONE_NAMES))]
+    # Use only the tone labels actually present in the test set
+    present_labels = sorted(list(set(y_test.tolist())))
+    tone_keys = [TONE_NAMES[i] for i in present_labels]
     per_class = classification_report(
-        y_test, preds, target_names=tone_keys,
-        output_dict=True, zero_division=0
+        y_test, preds,
+        labels=present_labels,
+        target_names=tone_keys,
+        output_dict=True,
+        zero_division=0
     )
     return {
         "accuracy"        : round(float(acc), 4),
@@ -206,11 +211,11 @@ def main():
         "layer_results"    : results,
     }
 
-    with open(os.path.join(run_dir, "probe_results.json"), "w") as f:
+    with open(os.path.join(run_dir, "probe_results.json"), "w", encoding="utf-8") as f:
         json.dump(full_results, f, indent=2)
-    with open(os.path.join(run_dir, "config_snapshot.json"), "w") as f:
+    with open(os.path.join(run_dir, "config_snapshot.json"), "w", encoding="utf-8") as f:
         json.dump({"whisper_model": WHISPER_MODEL, **cfg}, f, indent=2)
-    with open(os.path.join(RESULTS_DIR, "probe_results.json"), "w") as f:
+    with open(os.path.join(RESULTS_DIR, "probe_results.json"), "w", encoding="utf-8") as f:
         json.dump(full_results, f, indent=2)
 
     save_report(run_dir, results, n_samples, n_layers, majority)

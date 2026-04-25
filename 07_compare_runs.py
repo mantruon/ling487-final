@@ -44,7 +44,7 @@ def load_all_runs(runs_dir: str) -> list[dict]:
         run_path = os.path.join(runs_dir, entry, "probe_results.json")
         if not os.path.exists(run_path):
             continue
-        with open(run_path) as f:
+        with open(run_path, encoding="utf-8") as f:
             data = json.load(f)
         data["_run_dir"]  = entry
         data["_run_name"] = data.get("run_label", entry)

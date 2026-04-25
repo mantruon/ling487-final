@@ -110,7 +110,7 @@ def main():
 
     # Save meta
     meta_path = os.path.join(HIDDEN_STATES_DIR, "meta.json")
-    with open(meta_path, "w") as f:
+    with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f)
 
     print(f"\n✅ Saved hidden states for {len(meta)} clips → {HIDDEN_STATES_DIR}/")

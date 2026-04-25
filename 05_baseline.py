@@ -60,7 +60,7 @@ def main():
     if not os.path.exists(LABELED_PATH):
         raise FileNotFoundError(f"{LABELED_PATH} not found. Run 02_label_tones.py first.")
 
-    with open(LABELED_PATH) as f:
+    with open(LABELED_PATH, encoding="utf-8") as f:
         records = json.load(f)
     index_to_tone = {r["index"]: r["tone_id"] for r in records}
 
@@ -104,7 +104,7 @@ def main():
     X_train = scaler.fit_transform(X_train)
     X_test  = scaler.transform(X_test)
 
-    clf = LogisticRegression(max_iter=1000, multi_class="multinomial", solver="lbfgs", random_state=42)
+    clf = LogisticRegression(max_iter=1000, solver="lbfgs", random_state=42)
     clf.fit(X_train, y_train)
     preds = clf.predict(X_test)
 
@@ -113,13 +113,15 @@ def main():
     print(f"  Accuracy: {acc:.4f}")
 
     # Per-class report
-    target_names = [TONE_NAMES[i] for i in range(len(TONE_NAMES))]
-    print("\n" + classification_report(y_test, preds, target_names=target_names, zero_division=0))
+    # Use only tone labels actually present in the test set
+    present_labels = sorted(list(set(y_test.tolist())))
+    target_names = [TONE_NAMES[i] for i in present_labels]
+    print("\n" + classification_report(y_test, preds, labels=present_labels, target_names=target_names, zero_division=0))
 
     # ── Compare to Whisper probe ───────────────────────────────────────────────
     probe_path = os.path.join(RESULTS_DIR, "probe_results.json")
     if os.path.exists(probe_path):
-        with open(probe_path) as f:
+        with open(probe_path, encoding="utf-8") as f:
             probe_data = json.load(f)
         best_whisper = max(probe_data["layer_results"], key=lambda r: r["accuracy"])
         print(f"── Comparison ────────────────────────────────")
@@ -133,7 +135,7 @@ def main():
 
     # ── Save ──────────────────────────────────────────────────────────────────
     out_path = os.path.join(RESULTS_DIR, "baseline_results.json")
-    with open(out_path, "w") as f:
+    with open(out_path, "w", encoding="utf-8") as f:
         json.dump({"acoustic_baseline_accuracy": round(acc, 4)}, f, indent=2)
     print(f"\n  Results saved → {out_path}")
 

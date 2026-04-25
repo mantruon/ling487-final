@@ -3,15 +3,13 @@
 # Edit these values to change model size, dataset split, etc.
 # Automatically detects platform: Mac (MPS), Windows/Linux (CUDA or CPU).
 
-HF_HUB_DISABLE_SYMLINKS_WARNING=1 # gets rid of Hugging Face cache warning on Windows
-
+# Must be set before any huggingface imports to suppress Windows symlinks warning
 import os
+os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+
 import sys
 import platform
 import torch
-
-# Suppress Windows symlinks warning from Hugging Face cache
-os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 
 # ── Platform detection ────────────────────────────────────────────────────────
 SYSTEM = platform.system()   # "Darwin" = Mac, "Windows" = Windows, "Linux" = Linux
@@ -37,7 +35,7 @@ WHISPER_MODEL  = "openai/whisper-small"   # options: tiny, base, small, medium, 
 SAMPLE_RATE    = 16_000                   # Whisper expects 16 kHz audio
 
 # ── Dataset ───────────────────────────────────────────────────────────────────
-DATASET_NAME   = "doof-ferb/LSVSC"
+DATASET_NAME   = "doof-ferb/fpt_fosd"
 DATASET_LANG   = None
 DATASET_SPLIT  = "train"                  # "train" | "validation" | "test"
 MAX_SAMPLES    = 500                      # Set to None to use the full split
