@@ -4,7 +4,7 @@
 #
 # Usage: python 01_download_data.py
 
-from datasets import load_dataset
+from datasets import load_dataset, Audio
 from config import DATASET_NAME, DATASET_LANG, DATASET_SPLIT, MAX_SAMPLES
 
 def main():
@@ -12,6 +12,9 @@ def main():
 
     args = [DATASET_NAME] + ([DATASET_LANG] if DATASET_LANG else [])
     ds = load_dataset(*args, split=DATASET_SPLIT)
+
+    # Force soundfile-based audio decoding (avoids torchcodec/FFmpeg requirement)
+    ds = ds.cast_column("audio", Audio(sampling_rate=16000, decode=True))
 
     if MAX_SAMPLES is not None:
         ds = ds.select(range(min(MAX_SAMPLES, len(ds))))

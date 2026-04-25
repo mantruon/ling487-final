@@ -14,7 +14,7 @@ import json
 import os
 import numpy as np
 import torch
-from datasets import load_dataset
+from datasets import load_dataset, Audio
 from transformers import WhisperModel, WhisperProcessor
 from tqdm import tqdm
 from config import (
@@ -54,6 +54,7 @@ def main():
     print(f"Loading dataset…")
     args = [DATASET_NAME] + ([DATASET_LANG] if DATASET_LANG else [])
     ds = load_dataset(*args, split=DATASET_SPLIT)
+    ds = ds.cast_column("audio", Audio(sampling_rate=16000, decode=True))
     if MAX_SAMPLES is not None:
         ds = ds.select(range(min(MAX_SAMPLES, len(ds))))
 
