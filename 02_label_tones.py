@@ -41,7 +41,7 @@ def label_dataset(ds) -> list[dict]:
     tone_counts = {name: 0 for name in TONE_LABELS}
 
     for i, example in enumerate(tqdm(ds, desc="Labeling tones")):
-        transcription = example["transcription"]
+        transcription = example.get("sentence") or example.get("transcription", "")
         tone_name     = extract_tone(transcription)
         tone_id       = TONE_LABELS[tone_name]
 
@@ -58,7 +58,8 @@ def label_dataset(ds) -> list[dict]:
 
 def main():
     print(f"Loading {DATASET_NAME} ({DATASET_LANG}, {DATASET_SPLIT})…")
-    ds = load_dataset(DATASET_NAME, DATASET_LANG, split=DATASET_SPLIT, trust_remote_code=True)
+    args = [DATASET_NAME] + ([DATASET_LANG] if DATASET_LANG else [])
+    ds = load_dataset(*args, split=DATASET_SPLIT)
 
     if MAX_SAMPLES is not None:
         ds = ds.select(range(min(MAX_SAMPLES, len(ds))))

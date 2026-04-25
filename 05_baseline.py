@@ -66,7 +66,8 @@ def main():
 
     # ── Load dataset ──────────────────────────────────────────────────────────
     print("Loading dataset…")
-    ds = load_dataset(DATASET_NAME, DATASET_LANG, split=DATASET_SPLIT, trust_remote_code=True)
+    args = [DATASET_NAME] + ([DATASET_LANG] if DATASET_LANG else [])
+    ds = load_dataset(*args, split=DATASET_SPLIT)
     if MAX_SAMPLES is not None:
         ds = ds.select(range(min(MAX_SAMPLES, len(ds))))
 
