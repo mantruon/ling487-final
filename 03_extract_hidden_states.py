@@ -51,12 +51,13 @@ def main():
     print(f"Loaded {len(index_to_tone)} labeled indices.")
 
     # ── Load dataset ──────────────────────────────────────────────────────────
-    print(f"Loading dataset…")
+    print(f"Loading dataset...")
     args = [DATASET_NAME] + ([DATASET_LANG] if DATASET_LANG else [])
     ds = load_dataset(*args, split=DATASET_SPLIT)
-    ds = ds.cast_column("audio", Audio(sampling_rate=16000, decode=True))
     if MAX_SAMPLES is not None:
         ds = ds.select(range(min(MAX_SAMPLES, len(ds))))
+    # Cast after selecting to avoid decoding all audio upfront
+    ds = ds.cast_column("audio", Audio(sampling_rate=16000, decode=True))
 
     # ── Load Whisper ──────────────────────────────────────────────────────────
     print(f"Loading {WHISPER_MODEL} on {DEVICE}…")

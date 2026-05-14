@@ -50,10 +50,23 @@ def extract_tone(text: str) -> str:
 
     tone_counts["ngang"] = ngang_count
 
-    # Return the majority tone
+    # Return the majority tone, with tiebreaker priority:
+    # acoustically distinctive tones preferred over level/unmarked ones
+    TIEBREAK_PRIORITY = ["nang", "nga", "hoi", "sac", "huyen", "ngang"]
+
     if sum(tone_counts.values()) == 0:
         return "ngang"
-    return max(tone_counts, key=lambda t: tone_counts[t])
+
+    max_count = max(tone_counts.values())
+    candidates = [t for t, c in tone_counts.items() if c == max_count]
+
+    if len(candidates) == 1:
+        return candidates[0]
+
+    # Break ties by acoustic distinctiveness
+    for tone in TIEBREAK_PRIORITY:
+        if tone in candidates:
+            return tone
 
 
 def label_dataset(ds) -> list[dict]:

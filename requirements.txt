@@ -17,8 +17,8 @@ unicodedata2>=15.0.0
 # Mac (Apple Silicon M1/M2/M3/M4) — MPS acceleration built in:
 #   pip install torch>=2.0.0
 #
-# Windows/Linux with NVIDIA GPU — CUDA:
-#   pip install torch>=2.0.0 --index-url https://download.pytorch.org/whl/cu121
+# Windows/Linux with NVIDIA GPU — CUDA 12.8 (required for RTX 50 series):
+#   pip install torch>=2.0.0 --index-url https://download.pytorch.org/whl/cu128
 #
 # Windows/Linux CPU only:
 #   pip install torch>=2.0.0

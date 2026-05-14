@@ -16,11 +16,10 @@ import sys
 import platform
 import shutil
 
-SYSTEM = platform.system()   # "Darwin", "Windows", "Linux"
+SYSTEM = platform.system()
 
 
 def run(cmd: list[str]):
-    """Run a command and exit on failure."""
     print(f"\n$ {' '.join(cmd)}")
     result = subprocess.run(cmd, check=False)
     if result.returncode != 0:
@@ -29,22 +28,19 @@ def run(cmd: list[str]):
 
 
 def ensure_uv():
-    """Check uv is installed; print install instructions if not."""
     if shutil.which("uv") is None:
         print("❌ uv is not installed. Install it first:\n")
-        if SYSTEM == "Darwin" or SYSTEM == "Linux":
+        if SYSTEM in ("Darwin", "Linux"):
             print("  curl -LsSf https://astral.sh/uv/install.sh | sh")
         else:
             print("  powershell -c \"irm https://astral.sh/uv/install.ps1 | iex\"")
         print("\nThen re-run: python setup.py")
         sys.exit(1)
-
     result = subprocess.run(["uv", "--version"], capture_output=True, text=True)
     print(f"✅ uv found: {result.stdout.strip()}")
 
 
 def create_venv():
-    """Install Python 3.12 via uv if needed, then create the .venv."""
     print("\n🐍 Ensuring Python 3.12 is available...")
     run(["uv", "python", "install", "3.12"])
     print("\n📁 Creating virtual environment with uv (Python 3.12)...")
@@ -52,40 +48,36 @@ def create_venv():
 
 
 def install_torch():
-    """Install the correct PyTorch build for this platform via uv pip."""
-    uv_pip = ["uv", "pip", "install", "--python", ".venv/bin/python"
-              if SYSTEM != "Windows" else ".venv\\Scripts\\python.exe"]
+    uv_pip = ["uv", "pip", "install", "--python",
+              ".venv/bin/python" if SYSTEM != "Windows" else ".venv\\Scripts\\python.exe"]
 
     if SYSTEM == "Darwin":
         print("\n🍎 Detected macOS — installing PyTorch with MPS support...")
         run(uv_pip + ["torch>=2.0.0", "torchaudio>=2.0.0"])
 
-    elif SYSTEM == "Windows" or SYSTEM == "Linux":
+    elif SYSTEM in ("Windows", "Linux"):
         try:
-            result = subprocess.run(
-                ["nvidia-smi"], capture_output=True, text=True
-            )
+            result = subprocess.run(["nvidia-smi"], capture_output=True, text=True)
             has_gpu = result.returncode == 0
         except FileNotFoundError:
             has_gpu = False
 
         if has_gpu:
-            print("\n🟢 NVIDIA GPU detected — installing PyTorch with CUDA 12.1...")
+            # cu128 required for RTX 50 series (Blackwell, sm_120)
+            print("\n🟢 NVIDIA GPU detected — installing PyTorch with CUDA 12.8...")
             run(uv_pip + [
                 "torch>=2.0.0", "torchaudio>=2.0.0",
-                "--index-url", "https://download.pytorch.org/whl/cu121"
+                "--index-url", "https://download.pytorch.org/whl/cu128"
             ])
         else:
             print("\n💻 No GPU detected — installing CPU-only PyTorch...")
             run(uv_pip + ["torch>=2.0.0", "torchaudio>=2.0.0"])
-
     else:
         print(f"\n⚠️  Unknown platform '{SYSTEM}' — installing default PyTorch...")
         run(uv_pip + ["torch>=2.0.0", "torchaudio>=2.0.0"])
 
 
 def install_requirements():
-    """Install all other dependencies from requirements.txt via uv pip."""
     print("\n📦 Installing dependencies from requirements.txt...")
     python = (".venv/bin/python" if SYSTEM != "Windows"
               else ".venv\\Scripts\\python.exe")
@@ -93,7 +85,6 @@ def install_requirements():
 
 
 def verify():
-    """Quick sanity check — run inside the venv's Python."""
     print("\n🔍 Verifying install...")
     python = (".venv/bin/python" if SYSTEM != "Windows"
               else ".venv\\Scripts\\python.exe")
@@ -111,9 +102,8 @@ def verify():
 
 
 def print_activate_instructions():
-    """Remind the user how to activate the venv."""
     print("\n── Activate your environment before running scripts ──")
-    if SYSTEM == "Darwin" or SYSTEM == "Linux":
+    if SYSTEM in ("Darwin", "Linux"):
         print("  source .venv/bin/activate")
     else:
         print("  .venv\\Scripts\\activate")
