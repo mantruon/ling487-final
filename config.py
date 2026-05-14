@@ -31,14 +31,14 @@ DEVICE = get_device()
 print(f"[config] Platform: {SYSTEM} | Device: {DEVICE} | Python: {sys.version.split()[0]}")
 
 # ── Model ─────────────────────────────────────────────────────────────────────
-WHISPER_MODEL  = "openai/whisper-small"   # options: tiny, base, small, medium, large-v3
+WHISPER_MODEL  = "vinai/PhoWhisper-small"   # options: tiny, base, small, medium, large-v3
 SAMPLE_RATE    = 16_000                   # Whisper expects 16 kHz audio
 
 # ── Dataset ───────────────────────────────────────────────────────────────────
 DATASET_NAME   = "doof-ferb/fpt_fosd"
 DATASET_LANG   = None
 DATASET_SPLIT  = "train"                  # "train" | "validation" | "test"
-MAX_SAMPLES    = 500                      # Set to None to use the full split
+MAX_SAMPLES    = 2000                      # Set to None to use the full split
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 DATA_DIR            = "data"
@@ -78,7 +78,7 @@ PROBE_CONFIG = {
     "test_size"   : 0.2,       # Fraction of data held out for testing.
                                # Try: 0.1 (more training data), 0.3 (stricter test)
 
-    "random_seed" : 42,        # Controls train/test split and classifier init.
+    "random_seed" : 13,        # Controls train/test split and classifier init.
                                # Change to check result stability across splits.
 
     # ── Pooling strategy ──────────────────────────────────────────────────────
@@ -88,9 +88,9 @@ PROBE_CONFIG = {
                                # "first" = first frame only (like [CLS] token)
 
     # ── Run metadata (shown in report, helps you remember what you tested) ────
-    "run_label"   : "baseline",  # Short name for this run. Change for each experiment,
+    "run_label"   : "phowhisper-small",  # Short name for this run. Change for each experiment,
                                  # e.g. "C=0.1", "mlp_probe", "max_pooling", "seed=7"
-    "notes"       : "",          # Optional free-text notes about this run.
+    "notes"       : "testing with different whisper model: phowhisper-small w/ 2000 samples",          # Optional free-text notes about this run.
 }
 
 # ── Vietnamese tone map ───────────────────────────────────────────────────────

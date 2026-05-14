@@ -50,9 +50,9 @@ def load_data(hidden_states_dir: str) -> tuple[np.ndarray, np.ndarray]:
 def make_probe(cfg: dict):
     if cfg["probe_type"] == "linear":
         return LogisticRegression(
-            C=cfg["C"], max_iter=cfg["max_iter"], solver=cfg["solver"],
-            random_state=cfg["random_seed"],
-        )
+            C=cfg["C"], max_iter=cfg["max_iter"], solver=cfg["solver"], 
+            class_weight="balanced",random_state=cfg["random_seed"],
+        )          
     elif cfg["probe_type"] == "mlp":
         hidden = tuple([cfg["mlp_hidden"]] * cfg["mlp_layers"])
         return MLPClassifier(
